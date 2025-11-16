@@ -17,9 +17,9 @@ public class ModCreativeTabs {
     public static final RegistryObject<CreativeModeTab> WITW_TAB = CREATIVE_MODE_TABS.register("witw_tab",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.witw"))
-                    .icon(() -> new ItemStack(ModItems.VOID_TRANSMITTER.get())) // 使用虚空发射器作为图标
+                    .icon(() -> new ItemStack(ModItems.MOD_ICON.get())) // 使用mod_icon作为图标
                     .displayItems((parameters, output) -> {
-                        // 添加物品到标签页
+                        // 添加物品到标签页（不包括图标物品本身）
                         output.accept(ModItems.VOID_TRANSMITTER.get());
                         output.accept(ModItems.VOID_RECEIVER.get());
                     })

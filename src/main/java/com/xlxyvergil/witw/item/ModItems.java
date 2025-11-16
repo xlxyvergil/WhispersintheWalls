@@ -17,4 +17,8 @@ public class ModItems {
     // 注册物品：虚空接收器
     public static final RegistryObject<Item> VOID_RECEIVER = ITEMS.register("void_receiver",
             () -> new VoidReceiver(new Item.Properties()));
+            
+    // 注册物品：MOD图标（仅用于创造模式标签页，不在物品栏显示）
+    public static final RegistryObject<Item> MOD_ICON = ITEMS.register("mod_icon",
+            () -> new ModIcon(new Item.Properties().stacksTo(1)));
 }
