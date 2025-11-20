@@ -250,9 +250,8 @@ public class VoidTransmitter extends Item {
 
             // 检查是否已经存在相同的UUID
             if (!indexData.has(uuid)) {
-                // 添加新的UUID和玩家ID映射
+                // 添加新的UUID和玩家名称映射
                 JsonObject entry = new JsonObject();
-                entry.addProperty("playerId", playerId);
                 entry.addProperty("playerName", playerName);
                 indexData.add(uuid, entry);
 

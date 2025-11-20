@@ -33,7 +33,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 public class VoidReceiver extends Item {
@@ -152,7 +151,7 @@ public class VoidReceiver extends Item {
 
             for (String uuid : indexData.keySet()) {
                 JsonObject entry = indexData.getAsJsonObject(uuid);
-                if (entry.has("playerId") && entry.get("playerId").getAsString().equals(player.getStringUUID())) {
+                if (entry.has("playerName") && entry.get("playerName").getAsString().equals(player.getName().getString())) {
                     // 检查是否有已读取状态
                     if (!entry.has("read") || !entry.get("read").getAsBoolean()) {
                         selectedUUID = uuid;
