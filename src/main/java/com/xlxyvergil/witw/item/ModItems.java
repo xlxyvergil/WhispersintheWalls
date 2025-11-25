@@ -12,11 +12,11 @@ public class ModItems {
 
     // 注册物品：虚空发射器
     public static final RegistryObject<Item> VOID_TRANSMITTER = ITEMS.register("void_transmitter",
-            () -> new VoidTransmitter(new Item.Properties()));
+            () -> new VoidTransmitter(new Item.Properties().durability(15)));
 
     // 注册物品：虚空接收器
     public static final RegistryObject<Item> VOID_RECEIVER = ITEMS.register("void_receiver",
-            () -> new VoidReceiver(new Item.Properties()));
+            () -> new VoidReceiver(new Item.Properties().durability(3)));
             
     // 注册物品：MOD图标（仅用于创造模式标签页，不在物品栏显示）
     public static final RegistryObject<Item> MOD_ICON = ITEMS.register("mod_icon",

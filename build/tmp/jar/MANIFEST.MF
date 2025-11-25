@@ -3,7 +3,7 @@ Specification-Title: witw
 Specification-Vendor: xlxyvergil
 Specification-Version: 1
 Implementation-Title: WhispersintheWalls
-Implementation-Version: 1.0.0
+Implementation-Version: 1.0.1
 Implementation-Vendor: xlxyvergil
-Implementation-Timestamp: 2025-11-20T22:30:52+0800
+Implementation-Timestamp: 2025-11-26T01:28:19+0800
 

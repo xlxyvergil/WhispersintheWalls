@@ -39,6 +39,10 @@ public class VoidTransmitter extends Item {
     private static final Map<String, Long> pendingTasks = new HashMap<>();
     // 存储待处理任务的相关数据
     private static final Map<String, TaskData> taskDataMap = new HashMap<>();
+    
+    // NBT标签键名
+    private static final String OWNER_UUID_TAG = "OwnerUUID";
+    private static final String OWNER_NAME_TAG = "OwnerName";
 
     public VoidTransmitter(Properties properties) {
         super(properties);
@@ -46,6 +50,21 @@ public class VoidTransmitter extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        
+        // 检查物品是否有所有者信息
+        if (stack.hasTag()) {
+            CompoundTag tag = stack.getTag();
+            if (tag.contains(OWNER_UUID_TAG)) {
+                String ownerUUID = tag.getString(OWNER_UUID_TAG);
+                // 检查当前玩家是否为物品所有者
+                if (!player.getStringUUID().equals(ownerUUID)) {
+                    player.sendSystemMessage(Component.literal("该设备已绑定至其他玩家，您无法使用"));
+                    return InteractionResultHolder.fail(stack);
+                }
+            }
+        }
+        
         if (!world.isClientSide && player instanceof ServerPlayer) {
             String playerId = player.getStringUUID();
             long currentTime = System.currentTimeMillis();
@@ -54,7 +73,7 @@ public class VoidTransmitter extends Item {
             if (playerCooldowns.containsKey(playerId) && (currentTime - playerCooldowns.get(playerId)) < 15000) {
                 long remainingTime = (15000 - (currentTime - playerCooldowns.get(playerId))) / 1000;
                 player.sendSystemMessage(Component.literal("设备冷却中，剩余时间: " + remainingTime + "秒"));
-                return InteractionResultHolder.fail(player.getItemInHand(hand));
+                return InteractionResultHolder.fail(stack);
             }
 
             // 设置冷却时间
@@ -63,12 +82,20 @@ public class VoidTransmitter extends Item {
             // 添加到待处理任务中（5秒后生效）
             String taskId = UUID.randomUUID().toString();
             pendingTasks.put(taskId, currentTime + 5000); // 5秒后生效
-            taskDataMap.put(taskId, new TaskData(world, player, playerId));
+            taskDataMap.put(taskId, new TaskData(world, player, playerId, hand));
             
             player.sendSystemMessage(Component.literal("设备已激活，5秒后生效"));
+            
+            // 消耗1点耐久度
+            stack.hurt(1, player.getRandom(), null);
+            
+            // 如果物品耐久度已耗尽，则销毁物品
+            if (stack.getDamageValue() >= stack.getMaxDamage()) {
+                stack.shrink(1);
+            }
         }
 
-        return InteractionResultHolder.success(player.getItemInHand(hand));
+        return InteractionResultHolder.success(stack);
     }
 
     /**
@@ -282,16 +309,37 @@ public class VoidTransmitter extends Item {
         Level world;
         Player player;
         String playerId;
+        InteractionHand hand;
         
-        TaskData(Level world, Player player, String playerId) {
+        TaskData(Level world, Player player, String playerId, InteractionHand hand) {
             this.world = world;
             this.player = player;
             this.playerId = playerId;
+            this.hand = hand;
         }
     }
     
     // 用于存储玩家冷却的映射，供外部访问
     public static Map<String, Long> getPlayerCooldowns() {
         return playerCooldowns;
+    }
+    
+    // 当物品被合成时设置所有者信息
+    @Override
+    public void onCraftedBy(ItemStack stack, Level world, Player player) {
+        if (!world.isClientSide) {
+            // 创建NBT标签并存储所有者信息
+            CompoundTag tag = stack.getOrCreateTag();
+            tag.putString(OWNER_UUID_TAG, player.getStringUUID());
+            tag.putString(OWNER_NAME_TAG, player.getName().getString());
+            stack.setTag(tag);
+        }
+        super.onCraftedBy(stack, world, player);
+    }
+    
+    // 设置物品有耐久度
+    @Override
+    public boolean isDamageable(ItemStack stack) {
+        return true;
     }
 }
