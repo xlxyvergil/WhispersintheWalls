@@ -16,6 +16,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
@@ -32,6 +33,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -99,6 +101,25 @@ public class VoidReceiver extends Item {
         }
 
         return InteractionResultHolder.success(stack);
+    }
+
+    // 添加tooltip显示所有者信息
+    @Override
+    public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
+        
+        // 显示所有者信息
+        if (stack.hasTag()) {
+            CompoundTag tag = stack.getTag();
+            if (tag.contains(OWNER_NAME_TAG)) {
+                String ownerName = tag.getString(OWNER_NAME_TAG);
+                tooltip.add(Component.literal("绑定至: " + ownerName));
+            } else {
+                tooltip.add(Component.literal("未绑定"));
+            }
+        } else {
+            tooltip.add(Component.literal("未绑定"));
+        }
     }
 
     /**
